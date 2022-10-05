@@ -12,6 +12,8 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
+const { Pool } = require('pg')
+
 /**
  * @type {Cypress.PluginConfig}
  */
@@ -19,4 +21,28 @@
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+
+  //Criando uma Task que volta no Tempo (remover do banco)
+  const pool = new Pool({
+    host: 'jelani.db.elephantsql.com',
+    user: 'jkxxlxfj',
+    password: 'njDtSm_MG4Ul4J-i6UHl4Nb4bqdGKqLt',
+    database: 'jkxxlxfj',
+    port: 5432
+  })
+
+  //Criando uma Task que volta no Tempo (remover do banco)
+  on('task', {
+    removeUser(email) {
+      return new Promise(function (resolve) {
+        pool.query('DELETE FROM public.users WHERE email = $1', [email], function (error, result) {
+          if (error) {
+            throw error
+          }
+          resolve({ success: result })
+        })
+      })
+    }
+  })
+
 }
