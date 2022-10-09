@@ -1,4 +1,5 @@
 
+import signupPage from '../support/pages/signup'
 
 describe('Cadastro', function () {
 
@@ -6,7 +7,7 @@ describe('Cadastro', function () {
         const user = {
             name: 'Cleverson Purkot',
             email: 'cleverson.purkot@yahoo.com.br',
-            passwoard: 'Cypress123#$'
+            password: 'Cypress123#$'
         }
 
         before(function () {
@@ -18,62 +19,99 @@ describe('Cadastro', function () {
         })
 
         it('deve cadastrar com sucesso', function () {
-            //acessando a página de cadastro
-            cy.visit('/signup')
-
-            //preenchendo e submetendo o formulário de cadastro
-            cy.get('input[placeholder="Nome"]').type(user.name)
-            cy.get('input[placeholder="E-mail"]').type(user.email)
-            cy.get('input[placeholder="Senha"]').type(user.passwoard)
-
-            cy.contains('button', 'Cadastrar').click()
-
-            //validação do resultado esperado
-            cy.get('.toast')
-                .should('be.visible')
-                .find('p')
-                .should('have.text', 'Agora você se tornou um(a) Samurai, faça seu login para ver seus agendamentos!')
+            signupPage.go()
+            signupPage.form(user)
+            signupPage.submit()
+            signupPage.toast.shouldHaveText('Agora você se tornou um(a) Samurai, faça seu login para ver seus agendamentos!')
         })
 
-        context('quando o email já existe', function () {
-            const user = {
-                name: 'Cleverson Purkot Teste',
-                email: 'cleverson.purkot.5teste@yahoo.com.br',
-                password: 'Cypress123#$',
-                is_provider: true
-            }
+    })
 
-            before(function () {
-                cy.task('removeUser', user.email)
-                    .then(function (result) {
-                        console.log(result)
-                    })
+    context('quando o email já existe', function () {
+        const user = {
+            name: 'Cleverson Purkot Teste',
+            email: 'cleverson.purkot.5teste@yahoo.com.br',
+            password: 'Cypress123#$',
+            is_provider: true
+        }
 
-                cy.request(
-                    'POST',
-                    'http://localhost:3333/users',
-                    user
-                ).then(function (response) {
-                    expect(response.status).to.eq(200)
+        before(function () {
+            cy.task('removeUser', user.email)
+                .then(function (result) {
+                    console.log(result)
                 })
+
+            cy.request(
+                'POST',
+                'http://localhost:3333/users',
+                user
+            ).then(function (response) {
+                expect(response.status).to.eq(200)
             })
+        })
 
-            it('não deve cadastrar o usuário', function () {
+        it('não deve cadastrar o usuário', function () {
+            signupPage.go()
+            signupPage.form(user)
+            signupPage.submit()
+            signupPage.toast.shouldHaveText('Email já cadastrado para outro usuário.')
+        })
+    })
 
-                cy.visit('/signup')
+    context('quando o email é incorreto', function () {
+        const user = {
+            name: 'Elizabeth Olsen Domingou',
+            email: 'lizadate09102022.yahoo',
+            password: 'Cypress123#$',
+        }
 
-                cy.get('input[placeholder="Nome"]').type(user.name)
-                cy.get('input[placeholder="E-mail"]').type(user.email)
-                cy.get('input[placeholder="Senha"]').type(user.password)
+        it('deve exibir mensagem de alerta', function () {
+            signupPage.go()
+            signupPage.form(user)
+            signupPage.submit()
+            signupPage.alertHaveText('Informe um email válido')
+        })
+    })
 
-                cy.contains('button', 'Cadastrar').click()
+    context('quando a senha é muito curta', function () {
 
-                cy.get('.toast')
-                    .should('be.visible')
-                    .find('p')
-                    .should('have.text', 'Email já cadastrado para outro usuário.')
+        const passwords = ['1', '2a', 'ab3', 'abc4', 'ab#c5']
+
+        beforeEach(function () {
+            signupPage.go()
+        })
+
+        passwords.forEach(function (p) {
+            it('não deve cadastrar com a senha: ' + p, function () {
+                const user = { name: 'Jason Friday', email: 'jason@gmail.com', password: p }
+
+                signupPage.form(user)
+                signupPage.submit()
+            })
+        })
+
+        afterEach(function () {
+            signupPage.alertHaveText('Pelo menos 6 caracteres')
+        })
+    })
+
+    context('quando não preencho nenhum dos campos', function () {
+
+        const alertMessages = [
+            'Nome é obrigatório',
+            'E-mail é obrigatório',
+            'Senha é obrigatória'
+        ]
+
+        before(function () {
+            signupPage.go()
+            signupPage.submit()
+        })
+
+        alertMessages.forEach(function (alert) {
+            it('deve exibir ' + alert.toLocaleLowerCase(), function () {
+                signupPage.alertHaveText(alert)
             })
         })
     })
 })
-
