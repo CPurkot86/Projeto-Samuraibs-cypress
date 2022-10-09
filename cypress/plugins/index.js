@@ -22,15 +22,11 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 
-  //Criando uma Task que volta no Tempo (remover do banco)
-  const pool = new Pool({
-    host: 'jelani.db.elephantsql.com',
-    user: 'jkxxlxfj',
-    password: 'njDtSm_MG4Ul4J-i6UHl4Nb4bqdGKqLt',
-    database: 'jkxxlxfj',
-    port: 5432
-  })
+  const configJson = require(config.configFile)
 
+  //Criando uma Task que volta no Tempo (remover do banco)
+  const pool = new Pool(configJson.dbConfig)
+ 
   //Criando uma Task que volta no Tempo (remover do banco)
   on('task', {
     removeUser(email) {
