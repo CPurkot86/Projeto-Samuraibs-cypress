@@ -11,3 +11,4 @@ class Toast {
 }
 
 export default new Toast()
+require('cypress-dark')
