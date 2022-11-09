@@ -1,4 +1,4 @@
-# Projeto-Samuraibs-cypress
+# Projeto-Samuraibs-cypress E2E
 Projeto de automação de testes realizado no Curso QA Academy empresa samuraibs.
 
 ## A Stack
