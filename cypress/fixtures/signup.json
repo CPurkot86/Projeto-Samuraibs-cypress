@@ -1,0 +1,13 @@
+{
+  "success": {
+    "name": "Cleverson Purkot",
+    "email": "cleverson.purkot@yahoo.com.br",
+    "password": "Cypress123#$"
+  },
+  "email_inv": {
+    "name": "Cleverson Purkot",
+    "email": "cleverson.purkot@yahoo.com.br",
+    "password": "Cypress123#$",
+    "is_provider": true
+  }
+}
